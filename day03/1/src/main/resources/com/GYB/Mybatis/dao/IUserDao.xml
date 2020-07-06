@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.GYB.Mybatis.dao.IUserDao">
+    <select id="findAll" resultType="UsEr">
+        select * from user;
+    </select>
+    <insert id="save" parameterType="User">
+        insert into user(username,birthday,address,sex)values(#{username},#{birthday},#{address},#{sex});
+    </insert>
+    <update id="upData" parameterType="user">
+        update user set username=#{username},address=#{address},birthday=#{birthday},sex=#{sex} where id= #{id};
+    </update>
+    <select id="findById" resultType="User" parameterType="int">
+        select * from user where id = #{id};
+    </select>
+    <!--根据条件查询,if标签-->
+    <!--
+    <select id="findUserByCondition" resultType="user" parameterType="user">
+         select * from user where 1= 1
+         <if test="username != null">
+             and username = #{username}
+
+         </if>
+         <if test="sex != null">
+             and sex = #{sex}
+         </if>
+     </select>
+     -->
+    <!--条件查询，where标签，这样能避免在第21行写'where 1 = 1'-->
+    <select id="findUserByCondition" resultType="user" parameterType="user">
+        select * from user
+        <where>
+            <if test="username != null">
+                and username = #{username}
+
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+        </where>
+
+    </select>
+
+    <!--    根据Query中的id集合，实现查询用户-->
+    <select id="findUserByIds" resultType="user" parameterType="queryvo">
+        /*select  * from user*/
+        <include refid="defaultUser"/>
+        <where>
+            <if test="ids != null and ids.size()>0">
+                <foreach collection="ids" open="and id in (" close=")" item="id" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <sql id="defaultUser">
+        select  * from user
+    </sql>
+
+</mapper>
